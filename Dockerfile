@@ -1,83 +1,32 @@
-# ════════════════════════════════════════════════════════════════
-# 🚀 VIRAL EMPIRE - CLOUD RUN EDITION
-# أساس: الصورة الرسمية لـ n8n
-# ════════════════════════════════════════════════════════════════
 FROM docker.n8n.io/n8nio/n8n:latest
 
-# ════════════════════════════════════════════════════════════════
-# 📦 تثبيت أدوات الفيديو والصوت (كمدير للنظام)
-# ════════════════════════════════════════════════════════════════
 USER root
 
-# تحديث وتثبيت الحزم الأساسية دفعة واحدة (أكثر كفاءة)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # FFmpeg لمعالجة الفيديو/الصوت ومكتبات مساعدة
+# تثبيت ffmpeg و python و أدوات النظام
+RUN apk add --no-cache \
     ffmpeg \
-    # Python 3 وأداة التثبيت pip
     python3 \
-    python3-pip \
-    # أدوات مساعدة للشبكة والتحميل
-    curl \
-    wget \
-    # تنظيف الذاكرة المؤقتة لتقليل حجم الصورة
-    && rm -rf /var/lib/apt/lists/*
+    py3-pip \
+    ca-certificates \
+    bash \
+    curl
 
-# تثبيت yt-dlp (أحدث إصدار) باستخدام pip
-RUN pip3 install --break-system-packages --no-cache-dir yt-dlp
+# إعداد بيئة بايثون وتثبيت yt-dlp
+# يتم إنشاء بيئة افتراضية لتجنب تحذيرات النظام
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# ════════════════════════════════════════════════════════════════
-# ⚙️ إعدادات n8n الأساسية والإضافية
-# ════════════════════════════════════════════════════════════════
-# المنفذ الافتراضي لـ n8n (مهم!)
-ENV N8N_PORT=5678
-ENV N8N_HOST=0.0.0.0
-EXPOSE 5678
+# تثبيت yt-dlp وتحديثه لأخر نسخة
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir yt-dlp
 
-# المنطقة الزمنية
-ENV TZ=Asia/Riyadh
-ENV GENERIC_TIMEZONE=Asia/Riyadh
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# التأكد من صلاحيات التنفيذ للمجلدات المؤقتة (لحل مشكلة العقد الحمراء)
+RUN mkdir -p /tmp/n8n_files && chmod 777 /tmp/n8n_files
 
-# 🔐 مفتاح التشفير (مهم جداً للأمان - اقرأ الشرح أدناه)
-# استبدل النص بين علامتي التنصيص بمفتاحك القوي الخاص.
-ENV N8N_ENCRYPTION_KEY="a5j8F!kL9$pQrS2vX8zYbG3mN6cR7tT1wE4dH"
-
-# صلاحيات تنفيذ الأوامر والبرامج الخارجية (ضرورية لكوداتك)
-ENV N8N_BLOCK_ENV_ACCESS_IN_NODE=false
-ENV NODE_FUNCTION_ALLOW_BUILTIN=*
-ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
-ENV EXECUTIONS_PROCESS=main
-
-# تحسين أداء الذاكرة لـ Node.js
-ENV NODE_OPTIONS="--max-old-space-size=2048"
-
-# ════════════════════════════════════════════════════════════════
-# 📁 إعداد مجلدات العمل المؤقتة
-# ════════════════════════════════════════════════════════════════
-RUN mkdir -p /tmp/videos && chmod 1777 /tmp
-
-# ════════════════════════════════════════════════════════════════
-# 📝 سكربت البدء (مبسط)
-# ════════════════════════════════════════════════════════════════
-COPY <<EOF /home/node/start.sh
-#!/bin/bash
-echo ""
-echo "🚀 VIRAL EMPIRE - CLOUD RUN EDITION"
-echo "📦 الأدوات المثبتة:"
-echo "  • n8n: \$(n8n --version 2>/dev/null || echo 'جاهز')"
-echo "  • FFmpeg: \$(ffmpeg -version 2>&1 | head -1 | awk '{print \$3}')"
-echo "  • yt-dlp: \$(yt-dlp --version)"
-echo ""
-echo "🌍 المنطقة: \$TZ | 🔌 المنفذ: \$N8N_PORT"
-echo "⏳ جاري التشغيل..."
-exec n8n start
-EOF
-
-RUN chmod +x /home/node/start.sh
-
-# ════════════════════════════════════════════════════════════════
-# 🔄 العودة لمستخدم n8n العادي والتشغيل
-# ════════════════════════════════════════════════════════════════
+# العودة للمستخدم node للأمان
 USER node
-WORKDIR /home/node
-CMD ["bash", "/home/node/start.sh"]
+
+# إعدادات البيئة لـ ClawCloud
+ENV N8N_PORT=5678
+ENV GENERIC_TIMEZONE=Asia/Riyadh
+ENV TZ=Asia/Riyadh
