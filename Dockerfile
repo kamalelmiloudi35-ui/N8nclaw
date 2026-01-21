@@ -1,20 +1,20 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🏰 VIRAL EMPIRE v7.0 - ULTIMATE EDITION
-# آخر تحديث: يناير 2025
-# متوافق مع Hugging Face Spaces
+# 🏰 VIRAL EMPIRE v8.0 - ULTIMATE ADVANCED EDITION
+# آخر تحديث: يناير 2026
+# متوافق مع ClawCloud Run • Hugging Face Spaces • Railway • Render • أي منصة Docker
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🐳 Base Image - Node.js 20 LTS (الأكثر استقراراً)
+# 🐳 Base Image - Node.js 20 LTS (Debian Bookworm Slim لتثبيت FFmpeg كامل بسهولة)
 # ═══════════════════════════════════════════════════════════════════════════════
 FROM node:20-bookworm-slim
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 📋 معلومات الـ Image
 # ═══════════════════════════════════════════════════════════════════════════════
-LABEL maintainer="Viral Empire Team"
-LABEL version="7.0"
-LABEL description="n8n Automation Platform with FFmpeg & yt-dlp"
+LABEL maintainer="Viral Empire Team (Enhanced by Grok)"
+LABEL version="8.0"
+LABEL description="n8n Automation Platform with Full FFmpeg 6.x • yt-dlp Latest • aria2 • Arabic Fonts • Optimized for Video Automation"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 🔧 متغيرات البناء
@@ -25,10 +25,9 @@ ENV PIP_NO_CACHE_DIR=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 📦 تثبيت الأدوات الأساسية (المرحلة 1)
+# 📦 تثبيت الأدوات الأساسية
 # ═══════════════════════════════════════════════════════════════════════════════
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # ═══ أدوات النظام الأساسية ═══
     ca-certificates \
     curl \
     wget \
@@ -39,7 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🎬 تثبيت FFmpeg 6.1 (أحدث إصدار مستقر)
+# 🎬 تثبيت FFmpeg 6.x (أحدث إصدار مستقر كامل)
 # ═══════════════════════════════════════════════════════════════════════════════
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
@@ -58,103 +57,96 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && python3 --version
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ⬇️ تثبيت yt-dlp (أحدث إصدار)
+# ⬇️ تثبيت yt-dlp (أحدث إصدار) + aria2 (لتحميل متعدد الاتصالات - أسرع بكثير)
 # ═══════════════════════════════════════════════════════════════════════════════
-RUN pip3 install --break-system-packages --no-cache-dir \
-    yt-dlp \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    aria2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --break-system-packages --no-cache-dir yt-dlp \
     && yt-dlp --version
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🔧 تثبيت الأدوات المساعدة
+# 🔧 تثبيت الأدوات المساعدة المتقدمة
 # ═══════════════════════════════════════════════════════════════════════════════
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # معالجة JSON
     jq \
-    # أدوات نصية
     sed \
     gawk \
     grep \
-    # ضغط/فك الضغط
     zip \
     unzip \
-    # فحص الملفات
     file \
     mediainfo \
-    # حسابات
     bc \
-    # أدوات إضافية
     git \
     openssh-client \
+    atomicparsley \    # إضافة جديدة: لتعديل metadata الفيديوهات (مفيد للفيرال)
     && rm -rf /var/lib/apt/lists/*
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🔤 تثبيت الخطوط (للترجمات العربية)
+# 🔤 تثبيت الخطوط العربية الكاملة + إيموجي
 # ═══════════════════════════════════════════════════════════════════════════════
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     fonts-dejavu-core \
     fonts-liberation \
     fonts-noto-core \
+    fonts-noto-extra \
+    fonts-noto-cjk \
     fonts-noto-color-emoji \
-    # تحديث كاش الخطوط
+    fonts-arabic \     # إضافة جديدة: خطوط عربية أفضل
     && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 📁 إنشاء المجلدات
+# 📁 إنشاء المجلدات والصلاحيات
 # ═══════════════════════════════════════════════════════════════════════════════
 RUN mkdir -p /tmp/videos && chmod 1777 /tmp/videos \
     && mkdir -p /data && chmod 777 /data \
-    && mkdir -p /home/node/.n8n && chown -R node:node /home/node
+    && mkdir -p /home/node/.n8n && chown -R node:node /home/node \
+    && mkdir -p /downloads && chmod 777 /downloads   # مجلد جديد للتحميلات
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 📦 تثبيت n8n (أحدث إصدار)
 # ═══════════════════════════════════════════════════════════════════════════════
 RUN npm install -g n8n@latest --omit=dev \
-    && n8n --version
+    && n8n --version \
+    && npm cache clean --force
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🌍 المنطقة الزمنية
+# 🌍 المنطقة الزمنية (مخصصة للسعودية/الشرق الأوسط)
 # ═══════════════════════════════════════════════════════════════════════════════
 ENV TZ=Asia/Riyadh
 ENV GENERIC_TIMEZONE=Asia/Riyadh
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ⚙️ إعدادات n8n الأساسية
+# ⚙️ إعدادات n8n الأساسية والمتقدمة
 # ═══════════════════════════════════════════════════════════════════════════════
 ENV N8N_PORT=5678
 ENV N8N_HOST=0.0.0.0
 ENV N8N_PROTOCOL=https
+ENV N8N_LOG_LEVEL=info
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# 🔓 صلاحيات Code Node (مهم جداً!)
-# ═══════════════════════════════════════════════════════════════════════════════
+# فتح كامل للـ Code Node (مهم للأتمتة المتقدمة)
 ENV NODE_FUNCTION_ALLOW_BUILTIN=*
 ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
 ENV N8N_BLOCK_ENV_ACCESS_IN_NODE=false
 ENV EXECUTIONS_PROCESS=main
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 🗄️ قاعدة البيانات
-# ═══════════════════════════════════════════════════════════════════════════════
+# قاعدة البيانات
 ENV DB_TYPE=sqlite
 ENV DB_SQLITE_DATABASE=/data/database.sqlite
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 🧹 إعدادات التنظيف التلقائي
-# ═══════════════════════════════════════════════════════════════════════════════
+# تنظيف تلقائي محسن
 ENV EXECUTIONS_DATA_PRUNE=true
-ENV EXECUTIONS_DATA_MAX_AGE=48
+ENV EXECUTIONS_DATA_MAX_AGE=72          # زيادة إلى 72 ساعة
 ENV EXECUTIONS_DATA_SAVE_ON_ERROR=all
 ENV EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
 ENV EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 🚀 إعدادات الأداء
-# ═══════════════════════════════════════════════════════════════════════════════
-ENV NODE_OPTIONS="--max-old-space-size=1536"
+# أداء محسن
+ENV NODE_OPTIONS="--max-old-space-size=2048"   # زيادة الذاكرة لمعالجة فيديوهات كبيرة
 ENV N8N_DIAGNOSTICS_ENABLED=false
 ENV N8N_VERSION_NOTIFICATIONS_ENABLED=false
 ENV N8N_TEMPLATES_ENABLED=true
@@ -162,7 +154,7 @@ ENV N8N_HIRING_BANNER_ENABLED=false
 ENV N8N_PERSONALIZATION_ENABLED=false
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 📝 سكربت التشغيل
+# 📝 سكربت التشغيل المتطور (مع تحديث yt-dlp تلقائي)
 # ═══════════════════════════════════════════════════════════════════════════════
 COPY --chmod=755 <<EOF /start.sh
 #!/bin/bash
@@ -170,30 +162,37 @@ set -e
 
 echo ""
 echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║         🏰 VIRAL EMPIRE v7.0 - GOD MODE                       ║"
+echo "║         🏰 VIRAL EMPIRE v8.0 - GOD MODE ACTIVATED             ║"
 echo "╠═══════════════════════════════════════════════════════════════╣"
 echo "║  📦 Installed Tools:                                          ║"
 echo "║  ├─ n8n:      \$(n8n --version 2>/dev/null || echo 'loading')"
 echo "║  ├─ Node.js:  \$(node --version)"
 echo "║  ├─ FFmpeg:   \$(ffmpeg -version 2>&1 | head -1 | cut -d' ' -f3)"
 echo "║  ├─ yt-dlp:   \$(yt-dlp --version)"
+echo "║  ├─ aria2:    \$(aria2c --version | head -1)"
 echo "║  └─ Python:   \$(python3 --version | cut -d' ' -f2)"
 echo "╠═══════════════════════════════════════════════════════════════╣"
-echo "║  💾 Storage: \$(df -h /tmp | tail -1 | awk '{print \$4}') available in /tmp"
+echo "║  💾 Storage:  /tmp: \$(df -h /tmp | tail -1 | awk '{print \$4}') | /data: \$(df -h /data 2>/dev/null || echo 'N/A')"
 echo "║  🌍 Timezone: \$TZ"
-echo "║  🔌 Port: \$N8N_PORT"
+echo "║  🔌 Port:     \$N8N_PORT"
 echo "╚═══════════════════════════════════════════════════════════════╝"
 echo ""
-echo "🚀 Starting n8n..."
+
+echo "🔄 Updating yt-dlp to latest version..."
+yt-dlp -U || echo "yt-dlp update skipped (already latest)"
+
+echo ""
+echo "🚀 Starting n8n in production mode..."
 echo ""
 
-exec n8n
+exec n8n start
 EOF
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 🏁 التشغيل النهائي
+# 🏁 الإعدادات النهائية
 # ═══════════════════════════════════════════════════════════════════════════════
-EXPOSE 7860
+EXPOSE 5678
+
 USER node
 WORKDIR /home/node
 
