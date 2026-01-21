@@ -17,7 +17,7 @@ jobs:
           # اكتب اسم المستخدم هنا يدوياً لضمان عدم حدوث خطأ
           username: Kamalelmiloudi3
           # تأكد أن هذا السر يحتوي على الـ Access Token الصحيح (Read & Write)
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: dckr_pat_GhymRHjVG6J9b_K9oP5c-GMK0Fc
 
       - name: Build and push
         uses: docker/build-push-action@v5
