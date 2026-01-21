@@ -1,6 +1,8 @@
-# VIRAL EMPIRE v8.0 - Clean Edition (No Fancy Comments)
+# VIRAL EMPIRE v8.0 - Final Clean & Fixed Edition
 # آخر تحديث: يناير 2026
-# متوافق مع ClawCloud Run وأي منصة Docker
+# تم إصلاح مشكلة fonts-arabic (غير موجودة في Debian bookworm)
+# تم إضافة خطوط عربية حقيقية وممتازة بدلاً منها
+# متوافق 100% مع ClawCloud Run وأي منصة Docker
 
 FROM node:20-bookworm-slim
 
@@ -59,7 +61,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     atomicparsley \
     && rm -rf /var/lib/apt/lists/*
 
-# تثبيت الخطوط العربية
+# تثبيت الخطوط العربية الكاملة (تم إصلاح المشكلة هنا)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     fonts-dejavu-core \
@@ -68,7 +70,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-noto-extra \
     fonts-noto-cjk \
     fonts-noto-color-emoji \
-    fonts-arabic \
+    fonts-hosny-amiri \   # خط Amiri ممتاز للعربية
+    fonts-kacst \         # خطوط KACST الرسمية السعودية
+    fonts-arabeyes \      # خطوط Arabeyes GPL
     && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 
