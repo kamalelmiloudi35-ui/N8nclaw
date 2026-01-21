@@ -14,15 +14,16 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          # اكتب اسم المستخدم هنا يدوياً لضمان عدم حدوث خطأ
-          username: Kamalelmiloudi3
-          # تأكد أن هذا السر يحتوي على الـ Access Token الصحيح (Read & Write)
-          password: dckr_pat_GhymRHjVG6J9b_K9oP5c-GMK0Fc
+          # سيجلب الاسم Kamalelmiloudi3 من الـ Secrets تلقائياً
+          username: ${{ secrets.DOCKER_USERNAME }}
+          # سيجلب المفتاح dckr_pat_... من الـ Secrets تلقائياً
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: Kamalelmiloudi3/n8n-custom:latest
+          # سيتم رفع الصورة باسم: kamalelmiloudi3/n8n-custom:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/n8n-custom:latest
           
