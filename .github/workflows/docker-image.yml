@@ -31,7 +31,7 @@ jobs:
           context: .
           push: true
           # سيتم تسمية الصورة باسم: username/n8n-custom:latest
-          tags: ${{ secrets.DOCKER_USERNAME }}/n8n-custom:latest
+          tags: ${{ secrets.kamalelmiloudi3 }}/n8n-custom:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
